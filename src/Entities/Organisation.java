@@ -1,4 +1,7 @@
 package Entities;
 
-public class Organisation {
+import Entities.Abstract.Being;
+import Entities.Abstract.Purchasable;
+
+public class Organisation extends Being implements Purchasable {
 }
