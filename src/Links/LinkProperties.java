@@ -2,6 +2,5 @@ package Links;
 
 import java.util.ArrayList;
 
-// To store
-public class LinkProperties extends ArrayList<Property> {
+public class LinkProperties<T extends Property<?>> extends ArrayList<T> {
 }
