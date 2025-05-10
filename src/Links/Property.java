@@ -6,7 +6,7 @@ import Utils.Percentage;
 public class Property <T extends Purchasable> {
 
     private final T target;
-    enum PropertyQualifier {
+    public static enum PropertyQualifier {
         OWNER,
         EQUALS,
         PARTICIPANT,
@@ -43,4 +43,13 @@ public class Property <T extends Purchasable> {
     public String getComment() {
         return comment;
     }
+
+    @Override
+    public String toString() {
+        return target.getName() + " : \n" +
+                "   qualifier = " + qualifier + "\n" +
+                "   percentage = " + percentage + "\n" +
+                "   comment = " + (comment.isEmpty()?("No comment"):(comment));
+    }
+
 }
