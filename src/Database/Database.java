@@ -4,16 +4,18 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import Entities.Media.Publication;
+import Events.Abstract.Observer;
 import Utils.Percentage;
-import Entities.Media;
+import Entities.Media.Media;
 import Entities.Organisation;
 import Entities.Rich;
-import Links.LinkSameProperties;
 import Links.Property;
 
 import java.util.ArrayList;
+import java.util.Observable;
 
-public class Database {
+public class Database implements Observer {
 
     private String path;
 
@@ -29,13 +31,27 @@ public class Database {
         return path;
     }
 
-    public void loadMedia() {
+    public ArrayList<Media> getMediaList() {
+        return mediaList;
+    }
+    public ArrayList<Organisation> getOrganisationList() {
+        return organisationList;
+    }
+    public ArrayList<Rich> getRichList() {
+        return richList;
+    }
+
+    private String[] readTSVLine(String line) throws IOException {
+        return line.split("\t", -1); // -1 to include trailing empty strings
+    }
+
+    private void loadMedia() {
         System.out.println("Loading media");
         try (BufferedReader br = new BufferedReader(new FileReader(path + "/medias.tsv"))) {
             String line;
             br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
-                String[] fields = line.split("\t");
+                String[] fields = readTSVLine(line);
                 String name = fields[0];
                 String type = fields[1];
                 String periodicity = fields[2];
@@ -65,7 +81,7 @@ public class Database {
             case "presse (généraliste  politique  économique)":
                 return Media.MediaType.PRESS;
             default:
-                throw new IllegalArgumentException("Unknown media type: " + type);
+                return null;
         }
     }
 
@@ -89,7 +105,7 @@ public class Database {
             String line;
             br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
-                String[] fields = line.split("\t");
+                String[] fields = readTSVLine(line);
                 String name = fields[0];
                 String comment = fields.length > 1 ? fields[1] : "";
 
@@ -107,7 +123,7 @@ public class Database {
             String line;
             br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
-                String[] fields = line.split("\t");
+                String[] fields = readTSVLine(line);
                 String name = fields[0];
                 ArrayList<Integer> ranks = new ArrayList<>();
 
@@ -133,11 +149,11 @@ public class Database {
 
     private void loadRichOrganisationProperties() {
         System.out.println("Loading rich-organisation properties");
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(path + "/personne-organisation.tsv"))) {
             String line;
             br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
-                String[] fields = line.split("\t");
+                String[] fields = readTSVLine(line);
                 String origine = fields[1];
                 String qualificatif = fields[2];
                 String valeur = fields[3];
@@ -164,10 +180,16 @@ public class Database {
                             qualifier = Property.PropertyQualifier.EQUALS;
                             break;
                         case "contrôle":
-                            qualifier = Property.PropertyQualifier.SUPERIOR;
+                            qualifier = Property.PropertyQualifier.OWNER;
                             break;
                         case "participe":
                             qualifier = Property.PropertyQualifier.PARTICIPANT;
+                            break;
+                        case "supérieur à":
+                            qualifier = Property.PropertyQualifier.SUPERIOR;
+                            break;
+                        case "inférieur à":
+                            qualifier = Property.PropertyQualifier.INFERIOR;
                             break;
                         default:
                             throw new IllegalArgumentException("Unknown qualifier: " + qualificatif);
@@ -186,10 +208,196 @@ public class Database {
         }
     }
 
+    private void loadRichMediaProperties() {
+        System.out.println("Loading rich-media properties");
+        try (BufferedReader br = new BufferedReader(new FileReader(path + "/personne-media.tsv"))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] fields = readTSVLine(line);
+                String origine = fields[1];
+                String qualificatif = fields[2];
+                String valeur = fields[3];
+                String cible = fields[4];
+                String commentaire = fields.length > 5 ? fields[5] : "";
+
+                // Find the Rich object by name
+                Rich rich = richList.stream()
+                        .filter(r -> r.getName().equalsIgnoreCase(origine))
+                        .findFirst()
+                        .orElse(null);
+
+                // Find the Media object by name
+                Media media = mediaList.stream()
+                        .filter(m -> m.getName().equalsIgnoreCase(cible))
+                        .findFirst()
+                        .orElse(null);
+
+                if (rich != null && media != null) {
+                    // Parse PropertyQualifier
+                    Property.PropertyQualifier qualifier;
+                    switch (qualificatif.toLowerCase()) {
+                        case "égal à":
+                            qualifier = Property.PropertyQualifier.EQUALS;
+                            break;
+                        case "contrôle":
+                            qualifier = Property.PropertyQualifier.OWNER;
+                            break;
+                        case "participe":
+                            qualifier = Property.PropertyQualifier.PARTICIPANT;
+                            break;
+                        case "supérieur à":
+                            qualifier = Property.PropertyQualifier.SUPERIOR;
+                            break;
+                        case "inférieur à":
+                            qualifier = Property.PropertyQualifier.INFERIOR;
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown qualifier: " + qualificatif);
+                    }
+
+                    // Parse Percentage
+                    Percentage percentage = valeur.isEmpty() ? null : new Percentage(Double.parseDouble(valeur.replace("%", "")));
+
+                    // Create and add Property
+                    Property<Media> property = new Property<>(media, qualifier, percentage, commentaire);
+                    rich.addProperty(property);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadOrganisationOrganisationProperties() {
+        System.out.println("Loading organisation-organisation properties");
+        try (BufferedReader br = new BufferedReader(new FileReader(path + "/organisation-organisation.tsv"))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] fields = readTSVLine(line);
+                String origine = fields[1];
+                String qualificatif = fields[2];
+                String valeur = fields[3];
+                String cible = fields[4];
+                String commentaire = fields.length > 5 ? fields[5] : "";
+
+                // Find the source Organisation object by name
+                Organisation source = organisationList.stream()
+                        .filter(o -> o.getName().equalsIgnoreCase(origine))
+                        .findFirst()
+                        .orElse(null);
+
+                // Find the target Organisation object by name
+                Organisation target = organisationList.stream()
+                        .filter(o -> o.getName().equalsIgnoreCase(cible))
+                        .findFirst()
+                        .orElse(null);
+
+                if (source != null && target != null) {
+                    // Parse PropertyQualifier
+                    Property.PropertyQualifier qualifier;
+                    switch (qualificatif.toLowerCase()) {
+                        case "égal à":
+                            qualifier = Property.PropertyQualifier.EQUALS;
+                            break;
+                        case "contrôle":
+                            qualifier = Property.PropertyQualifier.OWNER;
+                            break;
+                        case "participe":
+                            qualifier = Property.PropertyQualifier.PARTICIPANT;
+                            break;
+                        case "supérieur à":
+                            qualifier = Property.PropertyQualifier.SUPERIOR;
+                            break;
+                        case "inférieur à":
+                            qualifier = Property.PropertyQualifier.INFERIOR;
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown qualifier: " + qualificatif);
+                    }
+
+                    // Parse Percentage
+                    Percentage percentage = valeur.isEmpty() ? null : new Percentage(Double.parseDouble(valeur.replace("%", "")));
+
+                    // Create and add Property
+                    Property<Organisation> property = new Property<>(target, qualifier, percentage, commentaire);
+                    source.addProperty(property);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadOrganisationMediaProperties() {
+        System.out.println("Loading organisation-media properties");
+        try (BufferedReader br = new BufferedReader(new FileReader(path + "/organisation-media.tsv"))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] fields = readTSVLine(line);
+                String origine = fields[1];
+                String qualificatif = fields[2];
+                String valeur = fields[3];
+                String cible = fields[4];
+                String commentaire = fields.length > 5 ? fields[5] : "";
+
+                // Find the source Organisation object by name
+                Organisation source = organisationList.stream()
+                        .filter(o -> o.getName().equalsIgnoreCase(origine))
+                        .findFirst()
+                        .orElse(null);
+
+                // Find the target Media object by name
+                Media target = mediaList.stream()
+                        .filter(m -> m.getName().equalsIgnoreCase(cible))
+                        .findFirst()
+                        .orElse(null);
+
+                if (source != null && target != null) {
+                    // Parse PropertyQualifier
+                    Property.PropertyQualifier qualifier;
+                    switch (qualificatif.toLowerCase()) {
+                        case "égal à":
+                            qualifier = Property.PropertyQualifier.EQUALS;
+                            break;
+                        case "contrôle":
+                            qualifier = Property.PropertyQualifier.OWNER;
+                            break;
+                        case "participe":
+                            qualifier = Property.PropertyQualifier.PARTICIPANT;
+                            break;
+                        case "supérieur à":
+                            qualifier = Property.PropertyQualifier.SUPERIOR;
+                            break;
+                        case "inférieur à":
+                            qualifier = Property.PropertyQualifier.INFERIOR;
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown qualifier: " + qualificatif);
+                    }
+
+                    // Parse Percentage
+                    Percentage percentage = valeur.isEmpty() ? null : new Percentage(Double.parseDouble(valeur.replace("%", "")));
+
+                    // Create and add Property
+                    Property<Media> property = new Property<>(target, qualifier, percentage, commentaire);
+                    source.addProperty(property);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadLinks(){
         System.out.println("Loading links");
 
-        // TO DO
+        loadRichOrganisationProperties();
+        loadRichMediaProperties();
+        loadOrganisationOrganisationProperties();
+        loadOrganisationMediaProperties();
 
     }
 
@@ -199,15 +407,36 @@ public class Database {
         loadMedia();
         loadOrganisations();
         loadRich();
-        loadRichOrganisationProperties();
+        loadLinks();
 
         System.out.println("Database loaded");
     }
 
-    public static void main(String[] args) {
-        Database db = new Database("Dataset");
-        db.load();
+    @Override
+    public void update(String state) {
+        System.out.println("Database received update: " + state);
 
-        System.out.println(db.richList.get(0).printAll());
+        // Extract the publication and target media name from the state
+        String[] parts = state.split(" ");
+        String author = parts[0];
+        String publicationName = parts[1];
+        String content = parts[2];
+
+        Publication publication = new Publication(author, publicationName, content);
+
+        // Find the target Media
+        Media targetMedia = mediaList.stream()
+                .filter(m -> m.getName().equalsIgnoreCase(publication.getAuthor()))
+                .findFirst()
+                .orElse(null);
+
+        if (targetMedia != null) {
+            // Add the publication to the Media
+            targetMedia.addPublication(publication);
+            System.out.println("Publication \"" + publicationName + "\" added to Media \"" + author + "\".");
+        } else {
+            System.out.println("Target Media \"" + author + "\" not found in the database.");
+        }
     }
+
 }

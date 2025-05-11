@@ -46,10 +46,10 @@ public class Property <T extends Purchasable> {
 
     @Override
     public String toString() {
-        return target.getName() + " : \n" +
-                "   qualifier = " + qualifier + "\n" +
-                "   percentage = " + percentage + "\n" +
-                "   comment = " + (comment.isEmpty()?("No comment"):(comment));
+        return "\n" + target.getName() + " : \n\t" +
+                "qualifier = " + qualifier + "\n\t" +
+                "percentage = " + percentage + "\n\t" +
+                "comment = " + (comment.isEmpty()?("No comment"):(comment));
     }
 
 }

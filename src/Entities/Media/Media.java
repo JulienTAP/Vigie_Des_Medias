@@ -1,6 +1,8 @@
-package Entities;
+package Entities.Media;
 
 import Entities.Abstract.Purchasable;
+
+import java.util.ArrayList;
 
 public class Media implements Purchasable {
 
@@ -22,12 +24,19 @@ public class Media implements Purchasable {
     private boolean free;
     private boolean available = true;
 
+    private ArrayList<Publication> publications = new ArrayList<Publication>();
+
+    public void addPublication(Publication publication) {
+        publications.add(publication);
+    }
+
     public Media(String name, MediaType mediaType, MediaPeriodicity mediaPeriodicity, String scale, boolean free) {
         this.name = name;
         this.mediaType = mediaType;
         this.mediaPeriodicity = mediaPeriodicity;
         this.scale = scale;
         this.free = free;
+
     }
     public Media(String name, MediaType mediaType, MediaPeriodicity mediaPeriodicity, String scale, boolean free, boolean available) {
         this.name = name;
@@ -60,10 +69,11 @@ public class Media implements Purchasable {
     @Override
     public String toString() {
         return (name + " :\n" +
-                "   Media Type: " + mediaType + "\n" +
-                "   Media Periodicity: " + mediaPeriodicity + "\n" +
-                "   Scale: " + scale + "\n" +
-                "   Free: " + (free?("Yes"):("No")) + "\n" +
-                "   Available: " + (available?("Yes"):("No")));
+                "\tMedia Type: " + mediaType + "\n" +
+                "\tMedia Periodicity: " + mediaPeriodicity + "\n" +
+                "\tScale: " + scale + "\n" +
+                "\tFree: " + (free?("Yes"):("No")) + "\n" +
+                "\tAvailable: " + (available?("Yes"):("No")) + "\n" +
+                "\tPublications: " + publications.toString());
     }
 }

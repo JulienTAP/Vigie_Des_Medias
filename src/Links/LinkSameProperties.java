@@ -16,4 +16,5 @@ public class LinkSameProperties<T extends Property<?>> extends LinkProperties<T>
     public String toString() {
         return super.toString();
     }
+
 }

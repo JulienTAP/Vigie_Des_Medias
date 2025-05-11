@@ -1,6 +1,6 @@
 package Entities.Abstract;
 
-import Entities.Media;
+import Entities.Media.Media;
 import Entities.Organisation;
 import Links.LinkSameProperties;
 import Links.Property;
@@ -88,12 +88,12 @@ public abstract class Being {
 
     @Override
     public String toString() {
-        return (name + ": \n" +
-                "   isMoral = " + (isMoral?("yes"):("no")));
+        return ("\n" + name + ":" +
+                "\n\tisMoral = " + (isMoral?("yes"):("no")));
     }
 
     public String printProperties(boolean all) {
-        return "   organisationProperties = " + (organisationProperties.isEmpty()?("Don't own any organisation"):(organisationProperties.printTree(all))) + "\n" +
-                "   mediaProperties = " + (mediaProperties.isEmpty()?("Don't own any media"):(mediaProperties.printTree(all))) + "\n";
+        return "\norganisationProperties = " + (organisationProperties.isEmpty()?("Don't own any organisation"):(organisationProperties.printTree(all)).replace("\n", "\n\t")) +
+                "\nmediaProperties = " + (mediaProperties.isEmpty()?("Don't own any media"):(mediaProperties.printTree(all)).replace("\n", "\n\t")) ;
     }
 }

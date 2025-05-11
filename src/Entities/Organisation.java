@@ -23,12 +23,14 @@ public class Organisation extends Being implements Purchasable {
 
     @Override
     public String toString() {
-        return super.toString() + "\n" +
-                "   comment = " + (comment.isEmpty()?("No comment"):(comment)) + "\n" + printProperties(false);
+        return super.toString()+
+                "\n\tcomment = " + (comment.isEmpty()?("No comment"):(comment)) +
+                "\n\t" + printProperties(false);
     }
 
-    public String printAll(){
-        return super.toString() + "\n" +
-                "   comment = " + (comment.isEmpty()?("No comment"):(comment)) + "\n" + printProperties(true);
+    public String printAll() {
+        return  super.toString()+
+                "\n\t" + "comment = " + (comment.isEmpty() ? "No comment" : comment) +
+                printProperties(true).replace("\n", "\n" + "\t");
     }
 }

@@ -18,12 +18,14 @@ public class Rich extends Being {
 
     @Override
     public String toString() {
-        return super.toString() + "\n" +
-                "   ranks = " + ranks.toString() + "\n" + printProperties(false);
+        return super.toString()+
+                "\n\tranks = " + ranks.toString() +
+                "\n\t" + printProperties(false);
     }
 
-    public String printAll(){
-        return super.toString() + "\n" +
-                "   ranks = " + ranks.toString() + "\n" + printProperties(true);
+    public String printAll() {
+        return super.toString()+
+                "\n\t" + "ranks = " + ranks.toString() +
+                printProperties(true).replace("\n", "\n" + "\t");
     }
 }
