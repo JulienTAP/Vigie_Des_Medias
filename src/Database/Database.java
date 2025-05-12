@@ -1,42 +1,42 @@
 package Database;
 
+import Entities.Media.Media;
+import Entities.Media.Publication;
+import Entities.Organisation;
+import Entities.Rich;
+import Events.Abstract.Observer;
+import Links.Property;
+import Utils.Percentage;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
-import Entities.Media.Publication;
-import Events.Abstract.Observer;
-import Utils.Percentage;
-import Entities.Media.Media;
-import Entities.Organisation;
-import Entities.Rich;
-import Links.Property;
-
 import java.util.ArrayList;
-import java.util.Observable;
 
 public class Database implements Observer {
 
-    private String path;
+    private final String path;
 
-    private ArrayList<Media> mediaList = new ArrayList<Media>();
-    private ArrayList<Organisation> organisationList = new ArrayList<Organisation>();
-    private ArrayList<Rich> richList = new ArrayList<Rich>();
+    private final ArrayList<Media> mediaList = new ArrayList<Media>();
+    private final ArrayList<Organisation> organisationList = new ArrayList<Organisation>();
+    private final ArrayList<Rich> richList = new ArrayList<Rich>();
 
-    public Database(String path){
+    public Database(String path) {
         this.path = path;
     }
 
-    public String getPath(){
+    public String getPath() {
         return path;
     }
 
     public ArrayList<Media> getMediaList() {
         return mediaList;
     }
+
     public ArrayList<Organisation> getOrganisationList() {
         return organisationList;
     }
+
     public ArrayList<Rich> getRichList() {
         return richList;
     }
@@ -391,7 +391,7 @@ public class Database implements Observer {
         }
     }
 
-    private void loadLinks(){
+    private void loadLinks() {
         System.out.println("Loading links");
 
         loadRichOrganisationProperties();
@@ -401,7 +401,7 @@ public class Database implements Observer {
 
     }
 
-    public void load(){
+    public void load() {
         System.out.println("Loading database from: " + path);
 
         loadMedia();

@@ -15,6 +15,7 @@ public abstract class Being {
     public boolean isMoral() {
         return isMoral;
     }
+
     public String getName() {
         return name;
     }
@@ -22,6 +23,7 @@ public abstract class Being {
     public LinkSameProperties<Property<Organisation>> getOrganisationProperties() {
         return organisationProperties;
     }
+
     public LinkSameProperties<Property<Media>> getMediaProperties() {
         return mediaProperties;
     }
@@ -89,11 +91,11 @@ public abstract class Being {
     @Override
     public String toString() {
         return ("\n" + name + ":" +
-                "\n\tisMoral = " + (isMoral?("yes"):("no")));
+                "\n\tisMoral = " + (isMoral ? ("yes") : ("no")));
     }
 
     public String printProperties(boolean all) {
-        return "\norganisationProperties = " + (organisationProperties.isEmpty()?("Don't own any organisation"):(organisationProperties.printTree(all)).replace("\n", "\n\t")) +
-                "\nmediaProperties = " + (mediaProperties.isEmpty()?("Don't own any media"):(mediaProperties.printTree(all)).replace("\n", "\n\t")) ;
+        return "\norganisationProperties = " + (organisationProperties.isEmpty() ? ("Don't own any organisation") : (organisationProperties.printTree(all)).replace("\n", "\n\t")) +
+                "\nmediaProperties = " + (mediaProperties.isEmpty() ? ("Don't own any media") : (mediaProperties.printTree(all)).replace("\n", "\n\t"));
     }
 }

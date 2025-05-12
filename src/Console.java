@@ -2,7 +2,6 @@ import Entities.Media.Media;
 import Entities.Media.Publication;
 import Entities.Organisation;
 import Entities.Rich;
-import Events.Abstract.Subject;
 import Events.Abstract.Observer;
 import Events.Abstract.Subject;
 
@@ -33,8 +32,7 @@ public class Console implements Subject {
     }
 
 
-
-    public void input(ArrayList<Media>mediaList, ArrayList<Organisation> organisationList, ArrayList<Rich> richList) {
+    public void input(ArrayList<Media> mediaList, ArrayList<Organisation> organisationList, ArrayList<Rich> richList) {
         Scanner scanner = new Scanner(System.in);
 
 

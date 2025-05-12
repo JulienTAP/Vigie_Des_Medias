@@ -7,18 +7,22 @@ import java.util.ArrayList;
 public class Media implements Purchasable {
 
     private String name;
+
     public static enum MediaType {
         TELEVISION,
         SITE,
         RADIO,
         PRESS,
     }
+
     private MediaType mediaType;
+
     public static enum MediaPeriodicity {
         DAILY,
         WEEKLY,
         MONTHLY,
     }
+
     private MediaPeriodicity mediaPeriodicity;
     private String scale;
     private boolean free;
@@ -38,6 +42,7 @@ public class Media implements Purchasable {
         this.free = free;
 
     }
+
     public Media(String name, MediaType mediaType, MediaPeriodicity mediaPeriodicity, String scale, boolean free, boolean available) {
         this.name = name;
         this.mediaType = mediaType;
@@ -50,18 +55,23 @@ public class Media implements Purchasable {
     public String getName() {
         return name;
     }
+
     public MediaType getMediaType() {
         return mediaType;
     }
+
     public MediaPeriodicity getMediaPeriodicity() {
         return mediaPeriodicity;
     }
+
     public String getScale() {
         return scale;
     }
+
     public boolean isFree() {
         return free;
     }
+
     public boolean isAvailable() {
         return available;
     }
@@ -72,8 +82,8 @@ public class Media implements Purchasable {
                 "\tMedia Type: " + mediaType + "\n" +
                 "\tMedia Periodicity: " + mediaPeriodicity + "\n" +
                 "\tScale: " + scale + "\n" +
-                "\tFree: " + (free?("Yes"):("No")) + "\n" +
-                "\tAvailable: " + (available?("Yes"):("No")) + "\n" +
+                "\tFree: " + (free ? ("Yes") : ("No")) + "\n" +
+                "\tAvailable: " + (available ? ("Yes") : ("No")) + "\n" +
                 "\tPublications: " + publications.toString());
     }
 }

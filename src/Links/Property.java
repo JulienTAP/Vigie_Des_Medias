@@ -3,9 +3,10 @@ package Links;
 import Entities.Abstract.Purchasable;
 import Utils.Percentage;
 
-public class Property <T extends Purchasable> {
+public class Property<T extends Purchasable> {
 
     private final T target;
+
     public static enum PropertyQualifier {
         OWNER,
         EQUALS,
@@ -13,6 +14,7 @@ public class Property <T extends Purchasable> {
         SUPERIOR,
         INFERIOR,
     }
+
     private PropertyQualifier qualifier;
     private Percentage percentage;
     private String comment = "";
@@ -49,7 +51,7 @@ public class Property <T extends Purchasable> {
         return "\n" + target.getName() + " : \n\t" +
                 "qualifier = " + qualifier + "\n\t" +
                 "percentage = " + percentage + "\n\t" +
-                "comment = " + (comment.isEmpty()?("No comment"):(comment));
+                "comment = " + (comment.isEmpty() ? ("No comment") : (comment));
     }
 
 }
